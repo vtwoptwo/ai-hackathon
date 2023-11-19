@@ -1,3 +1,6 @@
 openai
 python-dotenv
 azure-ai-formrecognizer==3.2.0
+pandas
+ipython
+openpyxl
