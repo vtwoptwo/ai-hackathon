@@ -7,7 +7,7 @@ import datetime
 LOGS_FOLDER = '.logs'
 
 
-def create_logger():
+def create_logger() -> logging.Logger:
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     logger_name = f'logger_{timestamp}'
     logger = logging.getLogger(logger_name)
