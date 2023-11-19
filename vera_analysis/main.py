@@ -19,21 +19,22 @@ from column_processors.cap import get_cap
 from column_processors.barrier import get_barrier
 from helpers.create_logger import create_logger
 from dataclasses import dataclass
+
 LOG = create_logger()
 
 @dataclass
 class row:
-    name: str
-    isin: str
-    issuer: str
-    underlyings: List[str]
-    currency: str
-    strike: str
-    launch_date: str
-    final_valuation_date: str
-    maturity: str
-    cap: str
-    barrier: str
+    name: str # vera
+    isin: str # vera
+    issuer: str #vera
+    underlyings: List[str] # vera
+    currency: str # vera
+    strike: str # hugo
+    launch_date: str # hugo
+    final_valuation_date: str  #hugo
+    maturity: str # hugo
+    cap: str # pablo
+    barrier: str # pablo
 
 
 def process_single_doc(doc_name:str) -> None:

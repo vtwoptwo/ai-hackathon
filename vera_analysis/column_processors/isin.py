@@ -12,7 +12,8 @@ def get_isin(document_path:str) -> str:
     json_doc = json.load(document_path)
     # regex
     # return the isin
-    # ISIN pattern \b[A-Z]{2}[A-Z0-9]{9}\d\b
+    # ISIN pattern \b[A-Z]{2}[A-Z0-9]{9}\d\b XS8474398038
+
     isin = re.search(r'\b[A-Z]{2}[A-Z0-9]{9}\d\b', json_doc)
     if len(isin) > 1:
         # take the first one
