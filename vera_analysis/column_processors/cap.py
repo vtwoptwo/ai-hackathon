@@ -57,7 +57,10 @@ def get_cap(document_name:str) -> str:
     data = json.load(f)
     example = "{all the information}"
     text = extract_numbers_with_context(data['full_text'])
-    prompt = f'''Regarding your task, you applied regex to create a dictionary where the keys are values followed by "%" in the term sheet, and each key has a list of sentences where it appears. To determine the cap, you simply need to return the numerical value associated with the term "Cap" in this dictionary. Have in mind that the value of the Underlaying cap is normally higher that 100 and that maybe that un most of the cases there is no Underlaying Cap. In that case you will just return And empty string (“”) as I showed you before. Here you have an example:
+    prompt = f'''The Cap is the maximum percetenge of an investment that the user will get.Regarding your task, you applied regex to create a dictionary where the keys are values followed by "%" in the term sheet, 
+                and each key has a list of sentences where it appears. To determine the cap, you simply need to return the numerical value associated with the term "Cap" in 
+                this dictionary. Have in mind that the value of the Underlaying cap is normally between 100 and 150 and that in most of the cases there is no Cap. 
+                In that case you will just return And empty string (“”) as I showed you before. Here you have an example:
                     ##dictionary
                     {example}
                     ##answer
@@ -80,8 +83,9 @@ def get_cap(document_name:str) -> str:
     
 
     cap = llm_call(llm, prompt)
+    print(cap)
     return str(cap)
 
-
+get_cap("C:/Users/34629/OneDrive - IE Students\Desktop/ai-hackathon/data_0611/OCR_output/XS2317910607.json")
 
 
