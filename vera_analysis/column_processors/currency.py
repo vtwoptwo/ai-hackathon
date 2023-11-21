@@ -39,7 +39,6 @@ def get_currency(document_path:str) -> str:
     with open(document_path, 'r') as f:
         loaded_json = json.load(f)
 
-    import pdb; pdb.set_trace()
     # Creating the regex pattern to check for all currencies
     pattern = r'\b(?:' + '|'.join(currencies) + r')\b'
     matches = re.findall(pattern, loaded_json['full_text'])

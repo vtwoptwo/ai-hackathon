@@ -3,13 +3,7 @@ import re
 
 
 def get_isin(document_path: str) -> str:
-    # do a regex function
-    # load the json based on the document path
-    # regex through the json to find the isin
-    # first check the keys of the json
-    # load
-    import pdb;
-    pdb.set_trace()
+
     # read a json file
     with open(document_path, 'r') as f:
         json_doc = json.load(f)

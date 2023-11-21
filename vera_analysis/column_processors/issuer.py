@@ -19,7 +19,7 @@ def get_issuer(document_path:str) -> str:
     with open(document_path, 'r') as f:
         loaded_json = json.loads(f.read())
 
-    loaded_json_key_value_pairs = loaded_json['key-value_pairs']
+    loaded_json_key_value_pairs = loaded_json['key-value_pairs'] #Issuer: null
     try:
         issuer = loaded_json_key_value_pairs['Issuer'][0]
     except KeyError as e:
@@ -27,7 +27,7 @@ def get_issuer(document_path:str) -> str:
         print(f'KeyError: {e}')
 
     documents = loaded_json['full_text']
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0, separator=" ")
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0.2, separator=" ")
     texts = text_splitter.split_text(documents)
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_texts(texts, embeddings)
@@ -56,8 +56,7 @@ def get_issuer(document_path:str) -> str:
         full_context += '\n' + f' I also did an OCR anaysis and found Issuer: {issuer} with a confidence of {issuer_confidence}'
 
     final_prompt = prompt.format(context=full_context)
-    result = llm.invoke(final_prompt)
-    import pdb; pdb.set_trace()
+    result = llm.invoke(final_prompt) # issuer: the issuer is bnp
     # if regex issuer in result
     if "Issuer:" in result:
          temp = result.split(":")[1].replace("\n", "")
@@ -87,9 +86,6 @@ def get_issuer(document_path:str) -> str:
         final_check_result = temp.replace("\n", "")
     final_result = final_check_result.replace("\n", "")
     return final_result
-
-
-
 
 # puntos de mejora:
 # hacer un aanalysis entero de key value pairs

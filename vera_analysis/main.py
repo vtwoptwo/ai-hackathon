@@ -24,15 +24,15 @@ LOG = create_logger()
 
 @dataclass
 class row:
-    name: str  # vera
-    isin: str  # vera
-    issuer: str  # vera
+    name: str  # vera v1
+    isin: str  # vera v1
+    issuer: str  # vera v1
     underlyings: List[str]  # vera
-    currency: str  # vera
-    strike: str  # hugo
+    currency: str  # vera v1
+    strike: str  # vera
     launch_date: str  # hugo
     final_valuation_date: str  # hugo
-    maturity: str  # hugo
+    maturity: str  # pablo
     cap: str  # pablo
     barrier: str  # pablo
 
@@ -48,7 +48,7 @@ def process_single_doc(doc_name: str, folder_path:str) -> None:
     name = get_name(doc_name)
     isin = get_isin(document_path=full_path)
     issuer = get_issuer(document_path=full_path)
-    underlyings = get_underlyings(doc_name)
+    underlyings = get_underlyings(document_path=full_path)
     currency = get_currency(document_path=full_path)
     strike = get_strike(doc_name)
     launch_date = get_launch_date(doc_name)
