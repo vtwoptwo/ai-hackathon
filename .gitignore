@@ -137,3 +137,6 @@ cython_debug/
 
 # Visual Studio Code
 .vscode/
+
+# Data Files
+*.pdf
