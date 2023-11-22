@@ -81,7 +81,7 @@ def get_issuer(document_path:str) -> str:
     )
     final_check_prompt = final_check.format(final_issuer=matches)
     final_check_result = llm.invoke(final_check_prompt)
-    if "Issuer:" in final_check_result:
+    if ":" in final_check_result:
         temp = final_check_result.split(":")[1].replace("\n", "")
         final_check_result = temp.replace("\n", "")
     final_result = final_check_result.replace("\n", "")

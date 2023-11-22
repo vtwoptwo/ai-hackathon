@@ -16,7 +16,7 @@ llm = OpenAI(
         temperature=0.5
     )
 
-
+#@retry(max_attempts=3)
 def get_underlyings(document_path:str) -> List[str]:
 
     with open(document_path, 'r') as f:
@@ -44,7 +44,7 @@ def get_underlyings(document_path:str) -> List[str]:
     full_prompt = prompt.format(context=full_context)
     result = llm.invoke(full_prompt)
     # now we do a second round of checking
-    import pdb; pdb.set_trace()
+
     final_check_template = PromptTemplate.from_template(
         "The list of underlyings is a list of stocks that the term sheet will include in its investment portfolio"
         " We have the following results from our first search for underlyings.{first_result}"
@@ -58,7 +58,7 @@ def get_underlyings(document_path:str) -> List[str]:
     final_final_check_template = PromptTemplate.from_template(
         "The list of underlyings is a list of stocks that the term sheet will include in its investment portfolio."
         "The list of stocks has to be a list of abbreviations of the indices/stocks which are part of the underlyings." 
-        "Example format: [RNO,VOW3,DAI,PAH3,GM]"
+        "Example format: [acronmy,acronym,...]"
         "The first result was: {final_result}"
         "Generate a list of acronyms of the stock:"
     )
