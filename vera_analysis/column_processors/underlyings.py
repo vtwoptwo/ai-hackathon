@@ -76,4 +76,4 @@ def get_underlyings(document_path:str) -> List[str]:
         final_final_result = llm.invoke(final_final_check)
         # clean final_final_result '\n\n["RNO", "VOW3", "DAI", "PAH3", "GM"]'
         res = final_final_result.replace("\n", "")
-    return
+        return [res]
