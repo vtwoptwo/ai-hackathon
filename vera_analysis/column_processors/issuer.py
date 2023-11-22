@@ -52,7 +52,11 @@ def get_issuer(document_path:str) -> str:
     for doc in docs:
         full_context += '\n' + doc.page_content
     if issuer:
-        issuer_confidence = loaded_json_key_value_pairs['Issuer'][1]
+        try:
+            issuer_confidence = loaded_json_key_value_pairs['Issuer'][1]
+        except KeyError as e:
+            issuer_confidence = None
+            print(f'No Issuer found in key value pairs: {e}')
         full_context += '\n' + f' I also did an OCR anaysis and found Issuer: {issuer} with a confidence of {issuer_confidence}'
 
     final_prompt = prompt.format(context=full_context)
@@ -62,8 +66,7 @@ def get_issuer(document_path:str) -> str:
          temp = result.split(":")[1].replace("\n", "")
          final_result = temp.replace("\n", "")
     else:
-        # strip the word issuer from the result
-        final_result = result.replace("Issuer:", "")
+        final_result = result.replace("\n", "")
 
     issuer_llm = final_result
     pattern = r'\b[A-Z][A-Za-z]*\b'

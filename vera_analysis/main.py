@@ -3,7 +3,7 @@ import os
 import json
 import argparse
 from typing import List
-
+import pandas as pd
 # our package functions
 from column_processors.isin import get_isin
 from column_processors.issuer import get_issuer
@@ -16,7 +16,7 @@ from column_processors.final_valuation_date import get_final_valuation_date
 from column_processors.maturity import get_maturity
 from column_processors.cap import get_cap
 from column_processors.barrier import get_barrier
-from helpers.create_logger import create_logger
+from column_processors.helpers import create_logger
 from dataclasses import dataclass
 
 LOG = create_logger()
@@ -37,25 +37,25 @@ class row:
     barrier: str  # pablo
 
 
+
 def process_single_doc(doc_name: str, folder_path:str) -> None:
     """
     Given a document, we split the processing step into several columns
     :param doc_name:
     :return:
     """
-    import pdb; pdb.set_trace()
     full_path = folder_path + '/' + doc_name
     name = get_name(doc_name)
     isin = get_isin(document_path=full_path)
     issuer = get_issuer(document_path=full_path)
     underlyings = get_underlyings(document_path=full_path)
     currency = get_currency(document_path=full_path)
-    strike = get_strike(doc_name)
-    launch_date = get_launch_date(doc_name)
-    final_valuation_date = get_final_valuation_date(doc_name)
-    maturity = get_maturity(doc_name)
-    cap = get_cap(doc_name)
-    barrier = get_barrier(doc_name)
+    strike = get_strike(full_path)
+    launch_date = get_launch_date(full_path)
+    final_valuation_date = get_final_valuation_date(full_path)
+    maturity = get_maturity(full_path)
+    cap = get_cap(document_name=full_path)
+    barrier = get_barrier(document_name=full_path)
 
     final_output = row(name=name, isin=isin,
                        issuer=issuer,
@@ -70,7 +70,18 @@ def process_single_doc(doc_name: str, folder_path:str) -> None:
 
     LOG.info(f'Processed {doc_name} with row {final_output}')
 
-    return None
+    row_final = {'name': final_output.name,
+                    'isin': final_output.isin,
+                    'issuer': final_output.issuer,
+                    'underlyings': final_output.underlyings,
+                    'currency': final_output.currency,
+                    'strike': final_output.strike,
+                    'launch_date': final_output.launch_date,
+                    'final_valuation_date': final_output.final_valuation_date,
+                    'maturity': final_output.maturity,
+                    'cap': final_output.cap,
+                    'barrier': final_output.barrier}
+    return row_final
 
 
 def generate_pipeline_for_files_in_general_folder(path_to_root_folder: str) -> None:
@@ -85,10 +96,18 @@ def generate_pipeline_for_files_in_general_folder(path_to_root_folder: str) -> N
     # TODO: bring in the intermediate step of OCR which is (1. take a pdf, 2. ocr it, 3. save the json output into desired folder)
 
     json_files_in_folder = [file for file in files_in_folder if file.endswith('.json')]
+    all_rows = []
     # ok so then, given this, we have a folder with the json files, we need to process each of them
     for file in json_files_in_folder:
         # we need to process each file
-        process_single_doc(file, path_to_root_folder)
+        x = process_single_doc(file, path_to_root_folder)
+        all_rows.append(x)
+
+    import pdb; pdb.set_trace()
+    # transform list od cits to dataframe
+    df = pd.DataFrame(all_rows)
+    # save dataframe to csv
+    df.to_csv('final_csvs.csv')
 
 
 # ok we need a main function which handles the main process pipeline
