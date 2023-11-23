@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from langchain.prompts import PromptTemplate
 from langchain.callbacks import get_openai_callback
 from dotenv import load_dotenv
 import json
@@ -7,17 +7,16 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from typing import List, Optional
 import re
-from helpers.utils import instruction_response
-from helpers.create_logger import create_logger
+from .helpers.utils import instruction_response, output_format_checker, generate_full_prompt, retry_on_rate_limit_error
+from .helpers.create_logger import create_logger
 import ast
-from helpers.utils import output_format_checker
-from helpers.utils import generate_full_prompt
 load_dotenv()
 import os
 import time
 LOG = create_logger()
 
 
+@retry_on_rate_limit_error(wait_time=10)
 @output_format_checker(max_attempts=10, desired_format=list)
 def get_underlyings(document_path: str) -> Optional[List[str]]:
     with open(document_path, 'r') as f:
@@ -74,7 +73,7 @@ def get_underlyings(document_path: str) -> Optional[List[str]]:
     pattern = r'\[[^\]]*\]'
     # Find all matches
     matches = re.findall(pattern, final_result)
-    import pdb; pdb.set_trace()
+
     if len(matches) == 1:
         final_result = matches[0]
         final = ast.literal_eval(final_result)
@@ -84,6 +83,3 @@ def get_underlyings(document_path: str) -> Optional[List[str]]:
         LOG.info('No matches found')
 
     return final_result
-
-path = '/Users/vtwoptwo/Desktop/docs/robotics_club/hackathons/ai-hackathon/data_0611/OCR_output/XS2358486194.json'
-get_underlyings(path)

@@ -2,9 +2,9 @@ import os
 import sys
 import pandas
 import functools
-from openai import OpenAI
+from openai import OpenAI, RateLimitError
 import os
-
+import time
 
 client = OpenAI()
 def instruction_response(prompt):
@@ -69,3 +69,21 @@ def generate_full_prompt(underlyings_docs, prompt):
     full_prompt = prompt.format(context=full_context)
     return full_prompt
 
+
+
+
+def retry_on_rate_limit_error(max_retries=3, wait_time=30):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            retries = 0
+            while retries < max_retries:
+                try:
+                    result = func(*args, **kwargs)
+                    return result  # If the function succeeded, return its result
+                except RateLimitError as e:
+                    print(f"RateLimitError encountered. Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                    retries += 1
+            raise RateLimitError("Max retries reached. RateLimitError persists.")
+        return wrapper
+    return decorator

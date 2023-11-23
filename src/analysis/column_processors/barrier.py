@@ -1,8 +1,6 @@
 import json
 import re
-from langchain import OpenAI, PromptTemplate
-from langchain.callbacks import get_openai_callback
-from helpers.utils import instruction_response
+from .helpers.utils import instruction_response
 
 
 def extract_numbers_with_context(text):
@@ -98,10 +96,6 @@ def get_barrier(document_name: str) -> str:
 #sheet5 = "XS2493928639" #None
 #get_barrier("C:/Users/34629/OneDrive - IE Students/Desktop/ai-hackathon/data_0611/OCR_output/"+sheet+".json")
 #get_barrier("C:/Users/34629/OneDrive - IE Students/Desktop/ai-hackathon/data_0611/OCR_output/AB5P75 - BNP 2-Year USD Bonus Certificate Worst-Of on Euro Stoxx 50 Price EUR, FTSE 100 Index and S_P 500.json")
-
-path = '/Users/vtwoptwo/Desktop/docs/robotics_club/hackathons/ai-hackathon/data_0611/OCR_output/XS2358486194.json'
-
-get_barrier(path)
 
 
 

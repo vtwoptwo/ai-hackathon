@@ -10,7 +10,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 import re
-from helpers.utils import instruction_response
+from .helpers.utils import instruction_response, retry_on_rate_limit_error
 
 
 
@@ -40,7 +40,7 @@ def find_sentence_containing_number(text, start, end):
     sentence = text[sentence_start:sentence_end].strip()
     return sentence
 
-
+@retry_on_rate_limit_error(wait_time=50)
 def get_cap(document_name: str) -> str:
     with open(document_name) as f:
         data = json.load(f)

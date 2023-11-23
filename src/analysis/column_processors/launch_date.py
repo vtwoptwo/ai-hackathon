@@ -6,6 +6,7 @@ import json
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
+from .helpers.utils import retry_on_rate_limit_error
 import re
 import sys
 
@@ -107,6 +108,7 @@ def get_relevant_documents(full_text:str, faiss_prompt:str) -> list:
 
     return docs
 
+@retry_on_rate_limit_error(wait_time=10)
 def get_launch_date(document_path:str) -> str:
 
     found_date, matched_synonym, full_text, json_key_value_pairs = open_json_and_search_key_value_pairs(document_path, synonyms)

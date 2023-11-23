@@ -9,22 +9,17 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from typing import List, Optional
 import re
-from helpers.utils import instruction_response
-from helpers.create_logger import create_logger
+from .helpers.utils import instruction_response, output_format_checker, generate_full_prompt, retry_on_rate_limit_error
+from .helpers.create_logger import create_logger
 import ast
-from helpers.utils import output_format_checker
-from helpers.utils import generate_full_prompt
+
+
 load_dotenv()
 import os
 import time
 LOG = create_logger()
 
-def generate_full__prompt(underlyings_docs, prompt):
-    full_context = ''
-    for doc in underlyings_docs:
-        full_context += '\n' + doc.page_content
-    full_prompt = prompt.format(context=full_context)
-    return full_prompt
+@retry_on_rate_limit_error(wait_time=20)
 @output_format_checker(max_attempts=10, desired_format=list)
 def get_strike(document_name:str) -> Optional[List[float]]:
     LOG.info("Loading document to extract strike prices")
@@ -38,9 +33,9 @@ def get_strike(document_name:str) -> Optional[List[float]]:
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_texts(texts, embeddings)
     retriever = db.as_retriever(search_kwargs={"k": 5})
-    bbloomberg = retriever.get_relevant_documents("Bloomberg", )
-    bbbg = retriever.get_relevant_documents("BBG", )
-    bcode = retriever.get_relevant_documents("Underlyings Index Code", )
+    bloomberg = retriever.get_relevant_documents("Bloomberg", )
+    bbg = retriever.get_relevant_documents("BBG", )
+    code = retriever.get_relevant_documents("Underlyings Index Code", )
 
     prompt_strike = PromptTemplate.from_template(
         "Extract the strikeprices based on the tickers of the underlyings (components/stocks) of term sheet"
@@ -54,20 +49,10 @@ def get_strike(document_name:str) -> Optional[List[float]]:
 
     )
     LOG.info("Generating prompts")
-    bloomberg_text = ''
-    for doc in bbloomberg:
-        bloomberg_text += '\n' + doc.page_content
-    bloomberg_prompt = prompt_strike.format(context=bloomberg_text)
 
-    bbg_text = ''
-    for doc in bbbg:
-        bbg_text += '\n' + doc.page_content
-    bbg_prompt = prompt_strike.format(context=bbg_text)
-
-    code_text = ''
-    for doc in bcode:
-        code_text += '\n' + doc.page_content
-    code_prompt = prompt_strike.format(context=code_text)
+    bbg_prompt = generate_full_prompt(bbg, prompt_strike)
+    bloomberg_prompt = generate_full_prompt(bloomberg, prompt_strike)
+    code_prompt = generate_full_prompt(code, prompt_strike)
 
     LOG.info("Prompt generation complete")
 
@@ -76,7 +61,7 @@ def get_strike(document_name:str) -> Optional[List[float]]:
     result_code = instruction_response(code_prompt)
 
     list_of_results = [result_bbg, result_bloomberg, result_code]
-    import pdb; pdb.set_trace()
+
     final_check_template = PromptTemplate.from_template(
         "The list of strike prices of the underlyings is a list of floats"
         "You found the following results in the first analysis: "
@@ -109,8 +94,3 @@ def get_strike(document_name:str) -> Optional[List[float]]:
         else:
             return None
 
-
-
-underlyings = ["XLP", "XLV", "SPY"]
-path = '/Users/vtwoptwo/Desktop/docs/robotics_club/hackathons/ai-hackathon/data_0611/OCR_output/XS2497687744.json'
-get_strike(path)

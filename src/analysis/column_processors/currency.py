@@ -1,4 +1,4 @@
-from langchain import OpenAI, PromptTemplate
+from langchain.prompts import PromptTemplate
 from langchain.callbacks import get_openai_callback
 from dotenv import load_dotenv
 import json
@@ -6,7 +6,8 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 import re
-from helpers.utils import instruction_response
+from .helpers.utils import instruction_response, retry_on_rate_limit_error
+
 #list of all currencies:world_currencies
 currencies = [
     'AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN',
@@ -30,6 +31,7 @@ currencies = [
 
 load_dotenv()
 
+@retry_on_rate_limit_error(wait_time=10)
 def get_currency(document_path:str) -> str:
 
     #read the document
@@ -59,6 +61,7 @@ def get_currency(document_path:str) -> str:
             "Take into account that the data from OCR and regex can be very exact" 
             "Your Response:"
             "<your answer here>")
+
         full_context = ''
         for doc in docs:
             full_context += '\n' + doc.page_content
