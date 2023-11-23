@@ -7,7 +7,7 @@ import pandas as pd
 from column_processors.isin import get_isin
 from column_processors.issuer import get_issuer
 from column_processors.name import get_name
-from column_processors.underlyings import get_underlyings
+from column_processors.underlyings import get_underlyings, retry_underlyings
 from column_processors.currency import get_currency
 from column_processors.strike import get_strike
 from column_processors.launch_date import get_launch_date
@@ -97,8 +97,8 @@ def process_single_doc(doc_name: str, folder_path:str) -> None:
     count = 0
     while len(underlyings) != len(strike) and count <= max:
         LOG.info("Retrying underlyings and strike: {count}")
-        underlyings = get_underlyings(document_path=full_path)
-        strike = get_strike(full_path)
+        underlyings, strike = retry_underlyings(document_path=full_path)
+
         count += 1
 
 

@@ -32,7 +32,7 @@ def get_strike(document_name:str) -> Optional[List[float]]:
     texts = text_splitter.split_text(documents)
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_texts(texts, embeddings)
-    retriever = db.as_retriever(search_kwargs={"k": 5})
+    retriever = db.as_retriever(search_kwargs={"k": 6})
     bloomberg = retriever.get_relevant_documents("Bloomberg", )
     bbg = retriever.get_relevant_documents("BBG", )
     code = retriever.get_relevant_documents("Underlyings Index Code", )
@@ -48,14 +48,10 @@ def get_strike(document_name:str) -> Optional[List[float]]:
         "Your response format example: [float,float,...]"
 
     )
-    LOG.info("Generating prompts")
 
     bbg_prompt = generate_full_prompt(bbg, prompt_strike)
     bloomberg_prompt = generate_full_prompt(bloomberg, prompt_strike)
     code_prompt = generate_full_prompt(code, prompt_strike)
-
-    LOG.info("Prompt generation complete")
-
     result_bbg = instruction_response(bbg_prompt)
     result_bloomberg = instruction_response(bloomberg_prompt)
     result_code = instruction_response(code_prompt)

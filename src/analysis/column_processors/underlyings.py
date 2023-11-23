@@ -15,6 +15,58 @@ import os
 import time
 LOG = create_logger()
 
+@retry_on_rate_limit_error(wait_time=20)
+@output_format_checker(max_attempts=10, desired_format=tuple)
+def retry_underlyings(document_path:str, prev_underlyings:List[str], prev_strike: List[str]) -> tuple[
+    List[str], List[float]]:
+    import pdb; pdb.set_trace()
+    with open(document_path, 'r') as f:
+        loaded_json = json.load(f)
+    documents = loaded_json['full_text']
+    text_splitter = CharacterTextSplitter(chunk_size=800, chunk_overlap=0.2, separator=" ")
+    texts = text_splitter.split_text(documents)
+    embeddings = OpenAIEmbeddings()
+    db = FAISS.from_texts(texts, embeddings)
+    retriever = db.as_retriever(search_kwargs={"k": 5})
+    docs = retriever.get_relevant_documents(prev_underlyings, )
+    docs_strike = retriever.get_relevant_documents(prev_strike, )
+    prompt = PromptTemplate.from_template(
+        "Extract the tickers of the underlyings (components/stocks) of term sheet"
+        "The strike prices and underlyings are usually mentioned together, and should be lists of the same length."
+        "We have the following underlyings: {underlyings}"
+        "We have the following strike prices: {strike}"
+        "Here the document context: {context}"
+        "Return me the list of underlyings and strike prices in the format of:\n"
+        "underlyings: [ticker,ticker,...]\n"
+        "strike: [float,float,...]"
+        "Your response format example: [ticker,ticker,...],[float,float,...]"
+    )
+    context = ''
+    for doc in docs:
+        context += '\n' + doc.page_content
+    for doc in docs_strike:
+        context += '\n' + doc.page_content
+    context = prompt.format(underlyings=prev_underlyings, strike=prev_strike, context=context)
+    result = instruction_response(context)
+    pattern = r'\[[^\]]*\]'
+    # Find all matches
+    matches = re.findall(pattern, result)
+    if len(matches) == 2:
+        # extract the two lists and identify which list has floats and which has strings
+        list1 = matches[0]
+        list2 = matches[1]
+        list1 = ast.literal_eval(list1)
+        list2 = ast.literal_eval(list2)
+        if all(isinstance(item, str) for item in list1):
+            # list1 is the list of underlyings
+            underlyings = list1
+            strike = list2
+        else:
+            # list2 is the list of underlyings
+            underlyings = list2
+            strike = list1
+        return underlyings, strike
+
 
 @retry_on_rate_limit_error(wait_time=10)
 @output_format_checker(max_attempts=10, desired_format=list)

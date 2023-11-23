@@ -105,11 +105,10 @@ the Underlying on a particular day\nFinal Level\nFor each Underlying, 100'], 120
         cap2 = instruction_response(prompt).strip()
         cap3 = instruction_response(prompt).strip()
         cap4 = instruction_response(prompt).strip()
-        cap5 = instruction_response(prompt).strip()
 
         # take cap1, cap2, cap3, cap4, cap5 and return the most common one
 
-        cap_list = [cap, cap2, cap3, cap4, cap5]
+        cap_list = [cap, cap2, cap3, cap4]
 
         # print(cap_list)
         if None or "" or "None" in cap_list:
