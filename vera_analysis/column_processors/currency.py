@@ -6,6 +6,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 import re
+from helpers.utils import instruction_response
 #list of all currencies:world_currencies
 currencies = [
     'AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN',
@@ -29,10 +30,6 @@ currencies = [
 
 load_dotenv()
 
-llm = OpenAI(
-        model="gpt-3.5-turbo-instruct",
-        temperature=0.5
-    )
 def get_currency(document_path:str) -> str:
 
     #read the document
@@ -53,8 +50,8 @@ def get_currency(document_path:str) -> str:
         texts = text_splitter.split_text(documents)
         embeddings = OpenAIEmbeddings()
         db = FAISS.from_texts(texts, embeddings)
-        retriever = db.as_retriever(search_kwargs={"k": 4})
-        docs = retriever.get_relevant_documents("What is the currency of this term sheet?")
+        retriever = db.as_retriever(search_kwargs={"k": 10})
+        docs = retriever.get_relevant_documents("Currency")
         template = PromptTemplate.from_template(
             "I am going to give you the text of a term sheet. "
             "Give me the resulting currency in which the money is traded of this term sheet\n\n"
@@ -73,7 +70,7 @@ def get_currency(document_path:str) -> str:
             full_context += '\n' + f' I also did an OCR anaysis and found Currency: {currency} with a confidence of {currency_confidence}'
 
         context = template.format(context=full_context)
-        result = llm.invoke(context)
+        result = instruction_response(context)
         currency = result
         final_response = re.findall(pattern, currency)
 
@@ -89,7 +86,7 @@ def get_currency(document_path:str) -> str:
             final_response = final_response[0]
             final_response = final_response.upper()
             final_response = final_check.format(currency=final_response)
-            result = llm.invoke(final_response)
+            result = instruction_response(final_response)
             final_response = result
             final_response = re.findall(pattern, final_response)
             final_response = final_response[0]

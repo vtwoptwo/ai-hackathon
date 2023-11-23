@@ -59,3 +59,13 @@ def output_format_checker(max_attempts, desired_format):
             raise ValueError(f"Max attempts ({max_attempts}) reached without getting the desired format '{desired_format}'")
         return wrapper
     return decorator
+
+
+
+def generate_full_prompt(underlyings_docs, prompt):
+    full_context = ''
+    for doc in underlyings_docs:
+        full_context += '\n' + doc.page_content
+    full_prompt = prompt.format(context=full_context)
+    return full_prompt
+

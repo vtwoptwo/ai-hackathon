@@ -11,36 +11,18 @@ from helpers.utils import instruction_response
 from helpers.create_logger import create_logger
 import ast
 from helpers.utils import output_format_checker
+from helpers.utils import generate_full_prompt
 load_dotenv()
 import os
 import time
 LOG = create_logger()
 
 
-def generate_full_prompt(underlyings_docs, prompt):
-    full_context = ''
-    for doc in underlyings_docs:
-        full_context += '\n' + doc.page_content
-    full_prompt = prompt.format(context=full_context)
-    return full_prompt
-
-
-
 @output_format_checker(max_attempts=10, desired_format=list)
 def get_underlyings(document_path: str) -> Optional[List[str]]:
-    time.sleep(10)
-    # find the number of mentions of underlyings in the term sheet cap and non cap
-    pattern = r'[Uu]nderlyings?'
-    matches = re.findall(pattern, document_path, re.IGNORECASE)
-    instances = len(matches)
-    if matches == 0:
-        instances = 5
     with open(document_path, 'r') as f:
-        loaded_json = json.loads(f.read())
-    if instances > 10:
-        k = 10
-    else:
-        k = instances
+        loaded_json = json.load(f)
+
     documents = loaded_json['full_text']
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0.2, separator=" ")
     texts = text_splitter.split_text(documents)
@@ -49,11 +31,19 @@ def get_underlyings(document_path: str) -> Optional[List[str]]:
     retriever = db.as_retriever(search_kwargs={"k": 5})
     bloomberg = retriever.get_relevant_documents("Bloomberg", )
     bbg = retriever.get_relevant_documents("BBG", )
-    code = retriever.get_relevant_documents("Index Code", )
+    code = retriever.get_relevant_documents("Underlings Index Code", )
 
     prompt = PromptTemplate.from_template(
-        "Context:"
-        "{context}"
+        "Extract the tickers of the underlyings (components/stocks) of term sheet"
+        "The list of underlyings is a list of stocks that the term sheet will include in its investment portfolio"
+        "You need to extract the tickers of the underlyings (components/stocks) of term sheet"
+        "Make sure that the tickers are presented in the format of tickers"
+        "Now we need to make sure that the list of tickers is in the format of tickers"
+        "Given the following context:"
+        "Context: {context}"
+        "Extract the tickers of the underlyings (components/stocks) of term sheet"
+        "Your response format example: [ticker,ticker,...]"
+
     )
 
     full_prompt_bloomberg = generate_full_prompt(bloomberg, prompt)
