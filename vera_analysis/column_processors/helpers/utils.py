@@ -11,6 +11,7 @@ def instruction_response(prompt):
     response = client.chat.completions.create(
         model="gpt-4",
         temperature=0,
+        seed=42,
         messages=[
             {
                 "role": "system",

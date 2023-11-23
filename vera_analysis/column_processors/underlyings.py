@@ -71,8 +71,9 @@ def get_underlyings(document_path: str) -> Optional[List[str]]:
         "The list of underlyings is a list of stocks that the term sheet will include in its investment portfolio"
         "You found the following results in the first analysis"
         "Now we need to make sure that the list of tickers is in the format of tickers"
-        "{first_result}"
-        "return only the list"
+        "You fund the following results for the underlyings: {first_result}"
+        "Now we need to make sure that we create a lsit of tickers (acrynoms or codes) of each stock."
+        "Your response should be a list"
         "Example of your response: [ticker,ticker,...]"
     )
 

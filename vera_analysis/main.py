@@ -57,6 +57,11 @@ def process_single_doc(doc_name: str, folder_path:str) -> None:
     cap = get_cap(document_name=full_path)
     barrier = get_barrier(document_name=full_path)
 
+    if len(underlyings) != len(strike):
+        underlyings = get_underlyings(document_path=full_path)
+        strike = get_strike(full_path)
+
+
     final_output = row(name=name, isin=isin,
                        issuer=issuer,
                        underlyings=underlyings,
