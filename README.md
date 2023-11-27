@@ -2,6 +2,8 @@
 <!-- PROJECT SHIELDS -->
 ![Project Status](https://img.shields.io/badge/status-active-success.svg)
 ![Python Version](https://img.shields.io/badge/python-3.10-blue.svg)
+<br>
+<br>
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
