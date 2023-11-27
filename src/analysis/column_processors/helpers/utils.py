@@ -5,23 +5,43 @@ import functools
 from openai import OpenAI, RateLimitError
 import os
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
+from .create_logger import create_logger
+
+LOG = create_logger()
 
 client = OpenAI()
-def instruction_response(prompt):
+
+
+def instruction_response(prompt, temp=0.5):
     response = client.chat.completions.create(
         model="gpt-4",
-        temperature=0,
-        seed=42,
+        temperature=temp,
         messages=[
             {
                 "role": "system",
-                "content": "You are a highly skilled AI trained in following instructions. You will be given an instruction and context. Answer as best as you can"
+                "content": "You are a highly skilled AI trained in following instructions. You will be given an instruction and context. Answer as best as you can",
             },
+            {"role": "user", "content": prompt},
+        ],
+    )
+    return response.choices[0].message.content
+
+
+def instruction_response_with_max_tokens(prompt, temp=0.5, max_tokens=100):
+    response = client.chat.completions.create(
+        model="gpt-4",
+        temperature=temp,
+        max_tokens=max_tokens,
+        messages=[
             {
-                "role": "user",
-                "content": prompt
-            }
-        ]
+                "role": "system",
+                "content": "You are a highly skilled AI trained in following instructions. You will be given an instruction and context. Answer as best as you can",
+            },
+            {"role": "user", "content": prompt},
+        ],
     )
     return response.choices[0].message.content
 
@@ -34,14 +54,14 @@ def transform_ground_truth(ground_truth_file_path: str, convert_to: str) -> None
     :param convert_to: 'csv' or 'xls'
     :return: None
     """
-    if convert_to == 'csv':
+    if convert_to == "csv":
         df = pandas.read_excel(ground_truth_file_path)
-        df.to_csv(ground_truth_file_path.replace('.xls', '.csv'), index=False)
-    elif convert_to == 'xls':
+        df.to_csv(ground_truth_file_path.replace(".xls", ".csv"), index=False)
+    elif convert_to == "xls":
         df = pandas.read_csv(ground_truth_file_path)
-        df.to_excel(ground_truth_file_path.replace('.csv', '.xls'), index=False)
+        df.to_excel(ground_truth_file_path.replace(".csv", ".xls"), index=False)
     else:
-        raise ValueError('convert_to must be either csv or xls')
+        raise ValueError("convert_to must be either csv or xls")
 
 
 def output_format_checker(max_attempts, desired_format):
@@ -54,22 +74,23 @@ def output_format_checker(max_attempts, desired_format):
                 if isinstance(result, desired_format):
                     return result
                 else:
-                    print(f"Output '{result}' is not an instance of '{desired_format}'. Rerunning the function...")
+                    LOG.info(
+                        f"Output '{result}' is not an instance of '{desired_format}'. Rerunning the function..."
+                    )
                     attempts += 1
-            raise ValueError(f"Max attempts ({max_attempts}) reached without getting the desired format '{desired_format}'")
+            return None
+
         return wrapper
+
     return decorator
 
 
-
 def generate_full_prompt(underlyings_docs, prompt):
-    full_context = ''
+    full_context = ""
     for doc in underlyings_docs:
-        full_context += '\n' + doc.page_content
+        full_context += "\n" + doc.page_content
     full_prompt = prompt.format(context=full_context)
     return full_prompt
-
-
 
 
 def retry_on_rate_limit_error(max_retries=3, wait_time=30):
@@ -81,9 +102,14 @@ def retry_on_rate_limit_error(max_retries=3, wait_time=30):
                     result = func(*args, **kwargs)
                     return result  # If the function succeeded, return its result
                 except RateLimitError as e:
-                    print(f"RateLimitError encountered. Retrying in {wait_time} seconds...")
+                    LOG.info(
+                        f"RateLimitError encountered. Retrying in {wait_time} seconds..."
+                    )
                     time.sleep(wait_time)
                     retries += 1
-            raise RateLimitError("Max retries reached. RateLimitError persists.")
+            LOG.info(f"{RateLimitError}: Max retries reached. RateLimitError persists.")
+            return None
+
         return wrapper
+
     return decorator

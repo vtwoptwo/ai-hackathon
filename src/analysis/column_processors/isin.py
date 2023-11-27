@@ -3,15 +3,13 @@ import re
 
 
 def get_isin(document_path: str) -> str:
-
     # read a json file
-    with open(document_path, 'r') as f:
+    with open(document_path, "r") as f:
         json_doc = json.load(f)
     # regex
     # return the isin
     # ISIN pattern \b[A-Z]{2}[A-Z0-9]{9}\d\b
-
-    isin_matches = re.findall(r'\b[A-Z]{2}[A-Z0-9]{9}\d\b', str(json_doc))
+    isin_matches = re.findall(r"\b[A-Z]{2}[A-Z0-9]{9}\d\b", str(json_doc))
     if isin_matches:
         # Take the first match if there are multiple
         isin = isin_matches[0]
