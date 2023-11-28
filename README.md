@@ -50,7 +50,9 @@ Improving the efficiency and performance of our application is a continual proce
 
 - **Enhanced Multiprocessing**: Introduce multiprocessing at two levels: for each document and for each column within those documents. By creating child processes at both levels, we can significantly speed up data processing and handling.
 
-- **Real-Time CSV Saving**: Modify the data handling mechanism to allow for the saving of CSV files while documents are still being loaded. This improvement could lead to more efficient memory usage and faster overall data processing times. 
+- **Real-Time CSV Saving**: Modify the data handling mechanism to allow for the saving of CSV files while documents are still being loaded. This improvement could lead to more efficient memory usage and faster overall data processing times.
+
+- - **Retry Decorators with Feedback to the Model**: Implement retry decorators that not only handle exceptions but also provide feedback to the model for continuous improvement. This approach aims to enhance the robustness of the application by allowing it to learn from operational challenges and adapt accordingly.
 
 
 ## 🛠 Tech Stack
