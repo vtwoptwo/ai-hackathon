@@ -42,6 +42,17 @@ This project employs advanced Retrieval Augmented Generation (RAG) techniques to
 - **Chain of Thought Reasoning**: This approach is used to break down complex data extraction tasks into simpler steps, enhancing the overall understanding and accuracy.
 - **Regex (Regular Expressions)**: Regular expressions are used for pattern matching and data validation in the OCR process. @vtwoptwo from the [IE Robotics & AI Club](https://github.com/ieroboticsclub) also conducted a [workshop](https://github.com/ieroboticsclub/workshops) on the topic of Regex. You can check out the video [here](youtube.com)
 
+## ✨ Possible Improvements (Check the [Issues][issues-url])
+
+Improving the efficiency and performance of our application is a continual process. Here are some potential enhancements that could be implemented in future versions:
+
+- **Optimized Temporary Database Loading**: Implement a strategy to load only one temporary database per document instead of creating separate instances for each column. This change aims to reduce memory usage and increase processing speed.
+
+- **Enhanced Multiprocessing**: Introduce multiprocessing at two levels: for each document and for each column within those documents. By creating child processes at both levels, we can significantly speed up data processing and handling.
+
+- **Real-Time CSV Saving**: Modify the data handling mechanism to allow for the saving of CSV files while documents are still being loaded. This improvement could lead to more efficient memory usage and faster overall data processing times. 
+
+
 ## 🛠 Tech Stack
 
 ![Langchain](https://img.shields.io/badge/Langchain-2023-blue.svg)
