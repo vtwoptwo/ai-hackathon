@@ -33,6 +33,21 @@ This project, developed as part of an AI Hackathon, focuses on Optical Character
 - 📊 Data extraction and analysis.
 - 📈 CSV format creation from extracted data.
 
+## 💡 RAG Techniques in the Project
+
+This project employs advanced Retrieval Augmented Generation (RAG) techniques to enhance its OCR and data extraction capabilities:
+
+- **In-Context Learning**: Utilizes historical data and contextual information to improve the accuracy of data extraction.
+- **Similarity Search through Cosine Similarity**: Employs cosine similarity measures within the FAISS vector database for efficient and accurate document retrieval.
+- **Chain of Thought Reasoning**: This approach is used to break down complex data extraction tasks into simpler steps, enhancing the overall understanding and accuracy.
+- **Regex (Regular Expressions)**: Regular expressions are used for pattern matching and data validation in the OCR process. @vtwoptwo from the [IE Robotics & AI Club](https://github.com/ieroboticsclub) also conducted a [workshop](https://github.com/ieroboticsclub/workshops) on the topic of Regex. You can check out the video [here](youtube.com)
+
+## 🛠 Tech Stack
+
+![Langchain](https://img.shields.io/badge/Langchain-2023-blue.svg)
+![FAISS](https://img.shields.io/badge/FAISS-Vector_DB-orange.svg)
+![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
+
 ## 📚 Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
@@ -101,10 +116,7 @@ src/analysis
 │   ├── cap.py
 │   ├── ...
 │   └── underlyings.py
-├── create_the_csv_format_from_ground_truth.ipynb
-├── main.py
-├── ocr.py
-└── predictions.csv
+└── main.py
 ```
 
 ## 👥 Contributing
