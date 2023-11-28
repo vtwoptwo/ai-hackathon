@@ -29,7 +29,6 @@ def get_maturity_and_final_date(document_name: str) -> Optional[list]:
     )
     texts = text_splitter.split_text(documents)
     embeddings = OpenAIEmbeddings(
-        openai_api_key="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"
     )
     db = FAISS.from_texts(texts, embeddings)
     retriever = db.as_retriever(search_kwargs={"k": 5})
